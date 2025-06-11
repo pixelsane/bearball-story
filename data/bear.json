@@ -1,0 +1,12 @@
+{
+  "spriteDirectory": "./assets/bear/",
+  "frameLists": {
+    "idle": ["idle1.png", "idle2.png", "idle3.png", "idle4.png", "idle5.png"],
+    "pitch": [
+      "pitch1.png", "pitch2.png", "pitch3.png", "pitch4.png", "pitch5.png",
+      "pitch6.png", "pitch7.png", "pitch8.png", "pitch9.png", "pitch10.png",
+      "pitch11.png", "pitch12.png"
+    ],
+    "swing": []
+  }
+}
