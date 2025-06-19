@@ -6,10 +6,19 @@ newAnimation = @spriteControllers.newAnimation
 
 dataDir = "./data/"
 assetsDir = "./assets/"
+ext = ".json"
 
 frameListKeys = ["idle", "pitch", "swing"]
 playerProps = { "id": null, "sprite": null, "frameLists": {}, "anims": {}}
 roster = new {"players" : {}}
+
+parsePlayerData = function(dataName)
+	filename = dataDir + dataName + ext
+	jsonFile = file.open(filename)
+	parsed = json.parse(jsonFile.read)
+	jsonFile.close
+  return parsed
+end function
 
 loadFrameListImages = function(playerData)
 	sprDir = playerData.spriteDirectory
@@ -24,18 +33,9 @@ loadFrameListImages = function(playerData)
 	end for
 end function
 
-getFrameLists = function(dataName)
-	ext = ".json"
-	filename = dataDir + dataName + ext
-	
-	jsonFile = file.open(filename)
-	parsed = json.parse(jsonFile.read)
-	sprDir = parsed.spriteDirectory
-	jsonFile.close
-	
-	loadFrameListImages(parsed)
-	
-	return parsed.frameLists
+getFrameLists = function(playerData)
+	loadFrameListImages(playerData)
+	return playerData.frameLists
 end function
 
 generateAnimations = function(playerEntity)
@@ -57,11 +57,13 @@ roster.loadPlayerData = function(id = null, name = null)
 		exit
 	end if
 	
+  playerData = parsePlayerData(name)
 	newPlayer = new playerProps
 	newPlayer.id = id
-	
+  newPlayer.strikezoneWidth = playerData.strikeZone.width
+  newPlayer.strikezoneHeight = playerData.strikeZone.height
 	newPlayer.sprite = new spriteControllers.Animated
-	newPlayer.frameLists = getFrameLists(name)
+	newPlayer.frameLists = getFrameLists(playerData)
 	generateAnimations(newPlayer)
 	
 	self.players[id] = newPlayer

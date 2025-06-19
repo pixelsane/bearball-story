@@ -1,0 +1,15 @@
+{
+  "spriteDirectory": "./assets/panda/",
+  "pitchRelease": {"x": 32, "y": 40},
+  "strikeZone": {
+    "width": 140, 
+    "height": 160
+  },
+  "frameLists": {
+    "idle": ["idle1.png"],
+    "pitch": [
+      "pitch1.png"
+    ],
+    "swing": []
+  }
+}

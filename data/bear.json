@@ -1,5 +1,10 @@
 {
   "spriteDirectory": "./assets/bear/",
+  "pitchRelease": {"x": 32, "y": 40},
+  "strikeZone": {
+    "width": 140, 
+    "height": 160
+  },
   "frameLists": {
     "idle": ["idle1.png", "idle2.png", "idle3.png", "idle4.png", "idle5.png"],
     "pitch": [
