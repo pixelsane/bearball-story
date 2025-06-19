@@ -18,23 +18,25 @@ display(6).clear
 ballpark.load(0, "bearstadium")
 pr.loadPlayerData(0, "bear")
 pr.loadPlayerData(1, "bear")
+pr.loadPlayerData(2, "panda")
 
 // init
 bear = pr.getPlayerById(0)
-bearSpr = bear.sprite
-bearSpr.curAnim = bear.anims.idle
+bear.curAnim = bear.idle
 
 bear2 = pr.getPlayerById(1)
-bear2Spr = bear2.sprite
-bear2Spr.curAnim = bear2.anims.idle
+bear2.curAnim = bear2.idle
 
-toMound(bearSpr)
-toSecond(bear2Spr)
-//toPlate(pandaSpr)
+panda = pr.getPlayerById(2)
+panda.curAnim = panda.idle
+
+toMound(bear)
+toSecond(bear2)
+//toBat(pandaSpr)
 
 ballpark.display 0
-spriteDisplay.sprites.push bear2Spr
-spriteDisplay.sprites.push bearSpr
+spriteDisplay.sprites.push bear2
+spriteDisplay.sprites.push bear
   
 displayStrikeZone = function(w, h, disp, x = 480, y = 210)	
 	originX = x - w / 2
@@ -89,7 +91,7 @@ lastTime = time
 while not key.pressed("escape")
 	dt = time - lastTime
 	lastTime = time
-	bearSpr.update dt
-	bear2Spr.update dt
+	bear.update dt
+	bear2.update dt
 	yield
 end while

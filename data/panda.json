@@ -5,6 +5,7 @@
     "width": 140, 
     "height": 160
   },
+  "animKeys": ["idle", "pitch"],
   "frameLists": {
     "idle": ["idle1.png"],
     "pitch": [
