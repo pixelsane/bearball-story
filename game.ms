@@ -2,42 +2,40 @@ import "player"
 import "bg"
 
 clear
-display(5).clear
 display(7).mode = displayMode.sprite
 display(6).mode = displayMode.pixel
 display(4).mode = displayMode.sprite
 
+display(7).clear
+display(6).clear
+display(5).clear
+display(4).clear
+
 // Globals
 pr = new player.roster
 ballpark = new bg.ballpark
-ballpark.disp = display(7)
 spriteDisplay = display(4)
 
 // preload
-display(6).clear
 ballpark.load(0, "bearstadium")
 pr.loadPlayerData(0, "bear")
 pr.loadPlayerData(1, "bear")
 pr.loadPlayerData(2, "panda")
 
 // init
-bear = pr.getPlayerById(0)
-bear.curAnim = bear.idle
+ballpark.display 0, display(7)
+pr.animate 0, "idle"
+pr.animate 1, "idle"
+pr.animate 2, "idlebat"
 
-bear2 = pr.getPlayerById(1)
-bear2.curAnim = bear2.idle
+pr.toMound 0
+pr.toSecond 1
+pr.toBat 2
 
-panda = pr.getPlayerById(2)
-panda.curAnim = panda.idle
+pr.toDisp 0, spriteDisplay
+pr.toDisp 1, spriteDisplay
+pr.toDisp 2, spriteDisplay  
 
-toMound(bear)
-toSecond(bear2)
-//toBat(pandaSpr)
-
-ballpark.display 0
-spriteDisplay.sprites.push bear2
-spriteDisplay.sprites.push bear
-  
 displayStrikeZone = function(w, h, disp, x = 480, y = 210)	
 	originX = x - w / 2
 	originY = y - h / 2
@@ -84,14 +82,15 @@ displayStrikeZoneOf = function(id, disp)
 	targetPlayer = pr.getPlayerById(id)
 	displayStrikeZone(targetPlayer.strikezoneWidth, targetPlayer.strikezoneHeight, disp)
 end function
-//displayStrikeZone(140, 160, spriteDisplay)
-displayStrikeZoneOf 0, spriteDisplay
+
+displayStrikeZoneOf 2, spriteDisplay
 
 lastTime = time
 while not key.pressed("escape")
 	dt = time - lastTime
 	lastTime = time
-	bear.update dt
-	bear2.update dt
+	pr.getPlayerById(0).update dt
+	pr.getPlayerById(1).update dt
+	pr.getPlayerById(2).update dt
 	yield
 end while

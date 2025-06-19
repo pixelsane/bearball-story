@@ -1,6 +1,7 @@
 import "json"
 import "listUtil"
 import "spriteControllers"
+import "bg"
 
 newAnimation = @spriteControllers.newAnimation
 Animated = @spriteControllers.Animated
@@ -50,4 +51,39 @@ roster.loadPlayerData = function(id, name)
   end for
 
   self.players[id] = newPlayer
+end function
+
+// Animation Methods
+roster.animate = function(id, animKey)
+  spr = self.players[id]
+  spr.curAnim = spr[animKey]
+end function
+
+
+// Position Methods
+
+roster.toMound = function(id)
+  spr = self.players[id]
+	spr.x = bg.MOUND_X
+	spr.y = bg.MOUND_Y
+	spr.scale = bg.MOUND_SCALE
+end function
+
+roster.toSecond = function(id)
+  spr = self.players[id]
+	spr.x = bg.SECONDBASE_X
+	spr.y = bg.SECONDBASE_Y
+	spr.scale = bg.INFIELD_SCALE
+end function
+
+roster.toBat = function(id)
+  spr = self.players[id]
+  spr.x = bg.PLATE_X
+  spr.y = bg.PLATE_Y
+  spr.scale = bg.BATTER_SCALE
+end function
+
+roster.toDisp = function(id, disp)
+  spr = self.players[id]
+  disp.sprites.push spr
 end function
