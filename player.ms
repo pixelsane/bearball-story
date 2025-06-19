@@ -37,6 +37,7 @@ roster.loadPlayerData = function(id, name)
   
 	newPlayer = new Animated
 	newPlayer.id = id
+  newPlayer.battingStance = playerData.battingStance
   newPlayer.strikezoneWidth = playerData.strikeZone.width
   newPlayer.strikezoneHeight = playerData.strikeZone.height
   for animKey in playerData.animKeys
@@ -54,8 +55,9 @@ roster.loadPlayerData = function(id, name)
 end function
 
 // Animation Methods
-roster.animate = function(id, animKey)
+roster.animate = function(id, animKey, loop = false)
   spr = self.players[id]
+  spr[animKey].loop = loop
   spr.curAnim = spr[animKey]
 end function
 

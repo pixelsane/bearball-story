@@ -1,11 +1,12 @@
 {
   "spriteDirectory": "./assets/panda/",
   "pitchRelease": {"x": 32, "y": 40},
+  "battingStance": "righty"
   "strikeZone": {
     "width": 120, 
     "height": 140
   },
-  "animKeys": ["idle", "pitch", "idlebat"],
+  "animKeys": ["idle", "pitch", "idlebat", "swing"],
   "frameLists": {
     "idle": ["idle1.png"],
     "pitch": [
@@ -14,6 +15,15 @@
     "idlebat": [
       "idlebat1.png"
     ],
-    "swing": []
+    "swing": [
+        "swing1.png",
+        "swing2.png",
+        "swing3.png",
+        "swing4.png",
+        "swing5.png",
+        "swing6.png",
+        "swing7.png",
+        "swing8.png"
+    ]
   }
 }

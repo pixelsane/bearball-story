@@ -1,6 +1,7 @@
 {
   "spriteDirectory": "./assets/bear/",
   "pitchRelease": {"x": 32, "y": 40},
+  "battingStance": "righty",
   "strikeZone": {
     "width": 140, 
     "height": 160
