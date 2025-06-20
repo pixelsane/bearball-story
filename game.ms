@@ -147,7 +147,8 @@ ball = new simulation.standardBaseball
 fastball = new ball
 fastball.physics.velocity.y = 42.7
 fastball.physics.velocity.z = -1.0
-
+fastball.physics.spin.x = 1800
+fastball.physics.spin.z  = -2200
 
 lastTime = time
 while not key.pressed("escape")
