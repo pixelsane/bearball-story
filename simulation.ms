@@ -7,8 +7,14 @@ vector3.x = 0
 vector3.y = 0
 vector3.z = 0
 
+globals.magnusLift = function(rpm, vel, liftFactor = 0.5)
+  spinRate = rpm * 2 * pi / 60
+  lift = -(spinRate / vel) * liftFactor
+  return lift
+end function
+
 ball = new vector3
-ball.physics = {"velocity": new vector3, "acceleration": new vector3, "pitchbreak": new vector3, "gravity": 0, "mass": 0, "force": 0, "momentum": 0, "drag": 0}
+ball.physics = {"velocity": new vector3, "acceleration": new vector3, "pitchbreak": new vector3, "gravity": 0, "mass": 0, "force": 0, "momentum": 0, "drag": 0, "backspinRate": 0}
 
 ball.positionupdate = function(dt)
   self.x += self.physics.velocity.x * dt
@@ -53,7 +59,7 @@ ball.update = function(dt)
   self.applyPitchbreak dt
   self.applydrag dt
   self.velocityupdate dt
-  // updates position on final calculation
+  // updates position on displace calculation
   self.positionupdate dt
 end function
 
@@ -67,39 +73,42 @@ standardBaseball.physics.drag = 0.05
 // EXAMPLE ONLY -- This is what the values should look like depending on the pitch type
 fastball = new standardBaseball
 fastball.physics.velocity.y = 43.5
-fastball.physics.velocity.z = -1.0
+fastball.physics.velocity.z = 0.0
+fastball.physics.pitchbreak.z = magnusLift
 
-slider = new standardBaseball
-slider.physics.velocity.y = 34
-slider.physics.velocity.z = -1.0
+// USE FOR TESTING
+breakTracker = {}
+breakTracker.pitch = null
+breakTracker.timer = 0.0
+breakTracker.plateY = 18.44
+breakTracker.finished = false
 
-curveball = new standardBaseball
-curveball.physics.velocity.y = 34
+breakTracker.originalX = null
+breakTracker.originalY = null
+breakTracker.originalZ = null
 
-// Testing
-test = {"pitchTime": 0, "over": false, "originalPos": null}
-testPitch = function(pitchToTest, dt)
-  pitchToTest.update dt
-  if test.over then
-    test.pitchTime = 0
+breakTracker.setPitch = function(pitch)
+  self.pitch = pitch
+  self.originalX = self.pitch.x
+  self.originalY = self.pitch.y
+  self.originalZ = self.pitch.z
+end function
+
+breakTracker.track = function(dt)
+  if self.finished then
     return
   end if
-  if test.originalPos == null then
-    test.originalPos = {"x": pitchToTest.x, "y": pitchToTest.y, "z": pitchToTest.z}
-  end if
-  plateY = 18.44
-  // Pitch sim example
-  if pitchToTest.y < plateY then
-    test.pitchTime += dt
-    pitchToTest.update dt
-    yield
+
+  if self.pitch.y < self.plateY then
+    self.timer += dt
+    self.pitch.update dt
   else
-    finalX = (pitchToTest.x - test.originalPos.x) * 39.3701
-    finalZ = (pitchToTest.z - test.originalPos.z) * 39.3701
-    pprint "ball reached the plate in " + test.pitchTime + " seconds"
-    pprint "with final position x: " + pitchToTest.x + " y: " + pitchToTest.y + " z: " + pitchToTest.z
-    pprint "the ball has " + finalX +" inches of horizontal movement"
-    pprint "the ball has " + finalZ +" inches of vertical movement"
-    test.over = true
+    self.displaceX = (self.pitch.x - self.originalX) * 39.3701
+    self.displaceY = (self.pitch.y - self.originalY) * 39.3701
+    self.displaceZ = (self.pitch.z - self.originalZ) * 39.3701
+    self.finished = true
+    
+    pprint "Horizontal Movement: " + self.displaceX + " inches!"
+    pprint "Vertical Movement: " + self.displaceZ + " inches!"
   end if
 end function

@@ -143,11 +143,12 @@ batCursor.enable "righty", spriteDisplay
 
 displayStrikeZoneOf 2, spriteDisplay
 
-ball = new simulation.standardBaseball
-fastball = new ball
-fastball.physics.velocity.y = 43.5
-fastball.physics.velocity.z = -1.0
+fastball = new simulation.standardBaseball
+fastball.physics.velocity.y = 44
+fastball.physics.pitchbreak.z = magnusLift(-2300, 44)
 
+tracker = new simulation.breakTracker
+tracker.setPitch(fastball)
 
 lastTime = time
 while not key.pressed("escape")
@@ -157,5 +158,6 @@ while not key.pressed("escape")
 	pr.getPlayerById(0).update dt
 	pr.getPlayerById(1).update dt
 	pr.getPlayerById(2).update dt
-	simulation.testPitch(fastball, dt)
+	tracker.track dt
+	yield
 end while
