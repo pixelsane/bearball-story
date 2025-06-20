@@ -144,6 +144,10 @@ batCursor.enable "righty", spriteDisplay
 displayStrikeZoneOf 2, spriteDisplay
 
 ball = new simulation.standardBaseball
+fastball = new ball
+fastball.physics.velocity.y = 43.5
+fastball.physics.velocity.z = -1.0
+
 
 lastTime = time
 while not key.pressed("escape")
@@ -153,5 +157,5 @@ while not key.pressed("escape")
 	pr.getPlayerById(0).update dt
 	pr.getPlayerById(1).update dt
 	pr.getPlayerById(2).update dt
-	simulation.testPitch(simulation.slider, dt)
+	simulation.testPitch(fastball, dt)
 end while

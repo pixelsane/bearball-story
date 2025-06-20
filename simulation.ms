@@ -1,56 +1,60 @@
-// The physics is simulated in a bird's eye view. 
-// And the rendering will be based on it, not the other way around.
-// This is meant for accuracy and extreme variation on gameplay
+// the physics is simulated in a bird's eye view. 
+// and the rendering will be based on it, not the other way around.
+// this is meant for accuracy and extreme variation on gameplay
 
-Vector3 = {"x": 0, "y": 0, "z": 0}
+vector3 = {}
+vector3.x = 0
+vector3.y = 0
+vector3.z = 0
 
-ball = new Vector3
-ball.physics = {"velocity": new Vector3, "acceleration": new Vector3, "pitchBreak": new Vector3, "spin": new Vector3, "gravity": 0, "mass": 0, "force": 0, "momentum": 0, "drag": 0, "spinFactor": 0}
+ball = new vector3
+ball.physics = {"velocity": new vector3, "acceleration": new vector3, "pitchbreak": new vector3, "gravity": 0, "mass": 0, "force": 0, "momentum": 0, "drag": 0}
 
-ball.positionUpdate = function(dt)
+ball.positionupdate = function(dt)
   self.x += self.physics.velocity.x * dt
   self.y += self.physics.velocity.y * dt
   self.z += self.physics.velocity.z * dt
 end function
 
-ball.velocityUpdate = function(dt)
+ball.velocityupdate = function(dt)
   self.physics.velocity.x = self.physics.velocity.x + self.physics.acceleration.x * dt
   self.physics.velocity.y = self.physics.velocity.y + self.physics.acceleration.y * dt
   self.physics.velocity.z = self.physics.velocity.z + self.physics.acceleration.z * dt
 end function
 
-ball.applyDrag = function(dt)
-  dragCoefficient = self.physics.drag
+ball.applydrag = function(dt)
+  dragcoefficient = self.physics.drag
   vel = self.physics.velocity
-  dragX = -vel.x * dragCoefficient
-  dragY = -vel.y * dragCoefficient
-  dragZ = -vel.z * dragCoefficient
+  dragx = -vel.x * dragcoefficient
+  dragy = -vel.y * dragcoefficient
+  dragz = -vel.z * dragcoefficient
 
-  self.physics.acceleration.x = self.physics.acceleration.x + dragX / self.physics.mass
-  self.physics.acceleration.y = self.physics.acceleration.y + dragY / self.physics.mass
-  self.physics.acceleration.z = self.physics.acceleration.z + dragZ / self.physics.mass
+  self.physics.acceleration.x += dragx / self.physics.mass
+  self.physics.acceleration.y += dragy / self.physics.mass
+  self.physics.acceleration.z += dragz / self.physics.mass
 end function
 
 // apply pitch break as a baseline for acceleration
 // this allows the ball to follow an expected trajectory modelled after the pitch type
-ball.applyPitchBreak = function(dt)
-  self.physics.acceleration.x = self.physics.pitchBreak.x
-  self.physics.acceleration.y = self.physics.pitchBreak.y
-  self.physics.acceleration.z = self.physics.pitchBreak.z + self.physics.gravity
+ball.applyPitchbreak = function(dt)
+  self.physics.acceleration.x = self.physics.pitchbreak.x
+  self.physics.acceleration.y = self.physics.pitchbreak.y
+  self.physics.acceleration.z = self.physics.pitchbreak.z + self.physics.gravity
 end function
 
-ball.setBreak = function
-  self.physics.pitchBreak.x = self.physics.spin.z * self.physics.spinFactor
-  self.physics.pitchBreak.y = -abs(self.physics.spin.x) * self.physics.spinFactor
+ball.resetAceleration = function
+  self.physics.acceleration.x = 0
+  self.physics.acceleration.y = 0
+  self.physics.acceleration.z = 0
 end function
 
 ball.update = function(dt)
-  self.setBreak
-  self.applyPitchBreak dt
-  self.applyDrag dt
-  self.velocityUpdate dt
+  self.resetAceleration
+  self.applyPitchbreak dt
+  self.applydrag dt
+  self.velocityupdate dt
   // updates position on final calculation
-  self.positionUpdate dt
+  self.positionupdate dt
 end function
 
 // Ball templates
@@ -58,32 +62,26 @@ standardBaseball = new ball
 standardBaseball.physics.mass = 0.145
 standardBaseball.physics.gravity = -9.8
 standardBaseball.physics.drag = 0.05
-standardBaseball.physics.spinFactor = 0.0001
 
 
 // EXAMPLE ONLY -- This is what the values should look like depending on the pitch type
 fastball = new standardBaseball
 fastball.physics.velocity.y = 43.5
 fastball.physics.velocity.z = -1.0
-fastball.physics.spin.x = -2200
-fastball.physics.spin.x = 200
 
 slider = new standardBaseball
-slider.physics.velocity.y = 42.7
+slider.physics.velocity.y = 34
 slider.physics.velocity.z = -1.0
-slider.physics.spin.x = 1800
-slider.physics.spin.z  = -2200
 
 curveball = new standardBaseball
 curveball.physics.velocity.y = 34
-curveball.physics.spin.x = 2500
-curveball.physics.spin.z = -500
-
 
 // Testing
 test = {"pitchTime": 0, "over": false, "originalPos": null}
 testPitch = function(pitchToTest, dt)
+  pitchToTest.update dt
   if test.over then
+    test.pitchTime = 0
     return
   end if
   if test.originalPos == null then
@@ -97,9 +95,11 @@ testPitch = function(pitchToTest, dt)
     yield
   else
     finalX = (pitchToTest.x - test.originalPos.x) * 39.3701
+    finalZ = (pitchToTest.z - test.originalPos.z) * 39.3701
     pprint "ball reached the plate in " + test.pitchTime + " seconds"
-    pprint "with final position x: " + pitchToTest.x + " y: " + pitchToTest.y
+    pprint "with final position x: " + pitchToTest.x + " y: " + pitchToTest.y + " z: " + pitchToTest.z
     pprint "the ball has " + finalX +" inches of horizontal movement"
+    pprint "the ball has " + finalZ +" inches of vertical movement"
     test.over = true
   end if
 end function
