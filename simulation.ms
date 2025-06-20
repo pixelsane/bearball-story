@@ -2,10 +2,9 @@
 // and the rendering will be based on it, not the other way around.
 // this is meant for accuracy and extreme variation on gameplay
 
-vector3 = {}
-vector3.x = 0
-vector3.y = 0
-vector3.z = 0
+vector3 = {"x": 0, "y": 0, "z": 0}
+
+physics = {"velocity": new vector3, "acceleration": new vector3, "pitchbreak": new vector3, "gravity": 0, "mass": 0, "force": 0, "momentum": 0, "drag": 0, "backspinRate": 0}
 
 globals.magnusLift = function(rpm, vel, liftFactor = 0.5)
   spinRate = rpm * 2 * pi / 60
@@ -14,10 +13,8 @@ globals.magnusLift = function(rpm, vel, liftFactor = 0.5)
 end function
 
 ball = new vector3
-ball.physics = {"velocity": new vector3, "acceleration": new vector3, "pitchbreak": new vector3, "gravity": 0, "mass": 0, "force": 0, "momentum": 0, "drag": 0, "backspinRate": 0}
 
-ball.positionupdate = function(dt)
-  self.x += self.physics.velocity.x * dt
+ball.positionupdate = function(dt) self.x += self.physics.velocity.x * dt
   self.y += self.physics.velocity.y * dt
   self.z += self.physics.velocity.z * dt
 end function
@@ -108,7 +105,7 @@ breakTracker.track = function(dt)
     self.displaceZ = (self.pitch.z - self.originalZ) * 39.3701
     self.finished = true
     
-    pprint "Horizontal Movement: " + self.displaceX + " inches!"
-    pprint "Vertical Movement: " + self.displaceZ + " inches!"
+    pprint "Horizontal Displacement: " + self.displaceX + " inches!"
+    pprint "Vertical Displacement: " + self.displaceZ + " inches!"
   end if
 end function

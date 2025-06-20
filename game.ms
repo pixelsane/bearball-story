@@ -1,6 +1,6 @@
 import "player"
 import "bg"
-import "simulation"
+import "simulationFP"
 
 clear
 display(7).mode = displayMode.sprite
@@ -143,12 +143,7 @@ batCursor.enable "righty", spriteDisplay
 
 displayStrikeZoneOf 2, spriteDisplay
 
-fastball = new simulation.standardBaseball
-fastball.physics.velocity.y = 44
-fastball.physics.pitchbreak.z = magnusLift(-2300, 44)
 
-tracker = new simulation.breakTracker
-tracker.setPitch(fastball)
 
 lastTime = time
 while not key.pressed("escape")
