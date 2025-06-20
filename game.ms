@@ -1,5 +1,6 @@
 import "player"
 import "bg"
+import "simulation"
 
 clear
 display(7).mode = displayMode.sprite
@@ -142,6 +143,12 @@ batCursor.enable "righty", spriteDisplay
 
 displayStrikeZoneOf 2, spriteDisplay
 
+ball = new simulation.standardBaseball
+fastball = new ball
+fastball.physics.velocity.y = 42.7
+fastball.physics.velocity.z = -1.0
+
+
 lastTime = time
 while not key.pressed("escape")
 	dt = time - lastTime
@@ -150,5 +157,11 @@ while not key.pressed("escape")
 	pr.getPlayerById(0).update dt
 	pr.getPlayerById(1).update dt
 	pr.getPlayerById(2).update dt
+	
+	// Pitch sim example
+	fastball.update dt
+	pprint "Moving at x: " + fastball.x
+	pprint "Moving at y: " + fastball.y
+	pprint "Moving at z: " + fastball.z
 	yield
 end while
