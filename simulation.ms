@@ -1,111 +1,178 @@
-// the physics is simulated in a bird's eye view. 
-// and the rendering will be based on it, not the other way around.
-// this is meant for accuracy and extreme variation on gameplay
-
-vector3 = {"x": 0, "y": 0, "z": 0}
-
-physics = {"velocity": new vector3, "acceleration": new vector3, "pitchbreak": new vector3, "gravity": 0, "mass": 0, "force": 0, "momentum": 0, "drag": 0, "backspinRate": 0}
-
-globals.magnusLift = function(rpm, vel, liftFactor = 0.5)
-  spinRate = rpm * 2 * pi / 60
-  lift = -(spinRate / vel) * liftFactor
-  return lift
+globals.vector3 = function(x = 0, y = 0, z = 0)
+  return {"x": x, "y": y, "z": z}
 end function
 
-ball = new vector3
-
-ball.positionupdate = function(dt) self.x += self.physics.velocity.x * dt
-  self.y += self.physics.velocity.y * dt
-  self.z += self.physics.velocity.z * dt
+globals.MPHtoMS = function(num)
+  return num * 0.447042667
 end function
 
-ball.velocityupdate = function(dt)
-  self.physics.velocity.x = self.physics.velocity.x + self.physics.acceleration.x * dt
-  self.physics.velocity.y = self.physics.velocity.y + self.physics.acceleration.y * dt
-  self.physics.velocity.z = self.physics.velocity.z + self.physics.acceleration.z * dt
+globals.DEGtoRAD = function(degrees)
+  return degrees * pi / 180
 end function
 
-ball.applydrag = function(dt)
-  dragcoefficient = self.physics.drag
-  vel = self.physics.velocity
-  dragx = -vel.x * dragcoefficient
-  dragy = -vel.y * dragcoefficient
-  dragz = -vel.z * dragcoefficient
-
-  self.physics.acceleration.x += dragx / self.physics.mass
-  self.physics.acceleration.y += dragy / self.physics.mass
-  self.physics.acceleration.z += dragz / self.physics.mass
+globals.RPMtoRADS = function(rpm)
+  return rpm * pi / 30
 end function
 
-// apply pitch break as a baseline for acceleration
-// this allows the ball to follow an expected trajectory modelled after the pitch type
-ball.applyPitchbreak = function(dt)
-  self.physics.acceleration.x = self.physics.pitchbreak.x
-  self.physics.acceleration.y = self.physics.pitchbreak.y
-  self.physics.acceleration.z = self.physics.pitchbreak.z + self.physics.gravity
+phys = function
+  // maybe return conversion methods from here later or another func
+  return {"mass": 0.145, "airDensity": 1.225, "gravity": 9.81, "radius": 0.037, "dragCoeff": 0.3}
 end function
 
-ball.resetAceleration = function
-  self.physics.acceleration.x = 0
-  self.physics.acceleration.y = 0
-  self.physics.acceleration.z = 0
+newBall = function
+  return {"position": vector3, "velocity": vector3, "acceleration": vector3, "forces": vector3, "spin": vector3, "spinRate": 0, "trajectory": [], "phys": phys}
+end function
+
+ball = newBall
+
+ball.reset = function
+  blank = newBall
+  self.position = blank.position
+  self.velocity = blank.velocity
+  self.acceleration = blank.acceleration
+  self.position = blank.position
+  self.trajectory = blank.trajectory
+  self.phys = blank.phys
+end function
+
+ball.initAccel = function
+  self.acceleration.x = self.forces.x / self.phys.mass
+  self.acceleration.y = self.forces.y / self.phys.mass
+  self.acceleration.z = self.forces.z / self.phys.mass
+end function
+
+ball.calculateForces = function
+  // Formula: sqrt x² + y² + z²
+  vel = self.velocity
+  speed = sqrt(vel.x ^ 2 + vel.y ^ 2 + vel.z ^ 2)
+  isStatic = speed == 0
+
+  if isStatic then
+    return vector3(0,0,0)
+  end if
+  
+  velDir = vector3(
+    self.velocity.x / speed,
+    self.velocity.y / speed,
+    self.velocity.z / speed)
+
+  gravity = vector3
+  gravity.y = -self.phys.gravity * self.phys.mass
+
+  dragForce = 0.5 * self.phys.airDensity * (speed ^ 2) * (pi * self.phys.radius ^ 2) ^ self.phys.dragCoeff
+  
+  drag = vector3(
+    -dragForce * velDir.x, 
+    -dragForce * velDir.y, 
+    -dragForce * velDir.z)
+
+  magnus = vector3 // TBA
+
+  return vector3(
+    gravity.x + drag.x + magnus.x,
+    gravity.y + drag.y + magnus.y,
+    gravity.z + drag.z + magnus.z)
+end function
+
+ball.initForces = function
+  self.forces = self.calculateForces
+end function
+
+ball.updateVel = function(dt)
+  self.velocity.x += self.acceleration.x * dt
+  self.velocity.y += self.acceleration.y * dt
+  self.velocity.z += self.acceleration.z * dt
+end function
+
+ball.updatePos = function(dt)
+  self.position.x += self.velocity.x * dt
+  self.position.y += self.velocity.y * dt
+  self.position.z += self.velocity.z * dt
+end function
+
+ball.setPitch = function(pitch)
+  self.reset
+  self.position = pitch.position
+  self.velocity = pitch.velocity
+  self.spin = pitch.spin
+  self.spinRate = pitch.spinRate
+end function
+
+ball.setHit = function
+  // this is different because hits makes the ball go up
+end function
+
+ball.setThrow = function
+
 end function
 
 ball.update = function(dt)
-  self.resetAceleration
-  self.applyPitchbreak dt
-  self.applydrag dt
-  self.velocityupdate dt
-  // updates position on displace calculation
-  self.positionupdate dt
+  self.initForces
+  self.initAccel
+  self.updateVel dt
+  self.updatePos dt
 end function
 
-// Ball templates
-standardBaseball = new ball
-standardBaseball.physics.mass = 0.145
-standardBaseball.physics.gravity = -9.8
-standardBaseball.physics.drag = 0.05
-
-
-// EXAMPLE ONLY -- This is what the values should look like depending on the pitch type
-fastball = new standardBaseball
-fastball.physics.velocity.y = 43.5
-fastball.physics.velocity.z = 0.0
-fastball.physics.pitchbreak.z = magnusLift
-
-// USE FOR TESTING
-breakTracker = {}
-breakTracker.pitch = null
-breakTracker.timer = 0.0
-breakTracker.plateY = 18.44
-breakTracker.finished = false
-
-breakTracker.originalX = null
-breakTracker.originalY = null
-breakTracker.originalZ = null
-
-breakTracker.setPitch = function(pitch)
-  self.pitch = pitch
-  self.originalX = self.pitch.x
-  self.originalY = self.pitch.y
-  self.originalZ = self.pitch.z
-end function
-
-breakTracker.track = function(dt)
-  if self.finished then
-    return
+globals.makePitch = function(releasePoint, mph, rpm, spin, angle = -2)
+  anyNull = releasePoint == null or mph == null or rpm == null or spin == null or angle == null
+  if anyNull then
+    pprint "WARNING: Pitch invalid, missing params"
   end if
+  // calculate and convert speeds from imperial since the sim calculates with m/s
+  // angle == -1 is a slight downward angle
+  speedMS = MPHtoMS(mph)
+  angle = DEGtoRAD(angle)
+  position = releasePoint
 
-  if self.pitch.y < self.plateY then
-    self.timer += dt
-    self.pitch.update dt
-  else
-    self.displaceX = (self.pitch.x - self.originalX) * 39.3701
-    self.displaceY = (self.pitch.y - self.originalY) * 39.3701
-    self.displaceZ = (self.pitch.z - self.originalZ) * 39.3701
-    self.finished = true
-    
-    pprint "Horizontal Displacement: " + self.displaceX + " inches!"
-    pprint "Vertical Displacement: " + self.displaceZ + " inches!"
-  end if
+  velocity = vector3(
+    0,
+    speedMS * sin(angle),
+    -speedMS * cos(angle))
+
+  // not used yet
+  // conversion from rp/m to rad/s
+  spinRate = RPMtoRADS(rpm)
+
+  // this returns a pitch config providing all necessary values to inject into the ball
+  pitch = {"position": position, "velocity": velocity, "spin": spin, "spinRate": spinRate}
+  return pitch
 end function
+
+// SAMPLE PITCHES -- NOT FOR REAL GAMEPLAY, just templates
+
+releasePoint = vector3
+// Four-seam Fastball - high velocity, backspin
+fourSeamFB = makePitch(releasePoint, 95, 2300, vector3(0, 0.9, 0.1), -2)
+
+// Two-seam Fastball - slightly slower, less spin, some side movement
+twoSeamFB = makePitch(releasePoint, 93, 2100, vector3(0.2, 0.8, 0.2), -2)
+
+// Changeup - much slower, reduced backspin
+changeup = makePitch(releasePoint, 82, 1700, vector3(0.1, 0.6, 0.3), -1)
+
+// Curveball - slow, heavy topspin
+curveball = makePitch(releasePoint, 78, 2800, vector3(0.3, -0.7, 0.6), 0)
+
+// Slider - moderate speed, side spin dominant
+slider = makePitch(releasePoint, 85, 2400, vector3(0.8, 0.2, 0.5), -1)
+
+// Cutter - fastball speed, late breaking action
+cutter = makePitch(releasePoint, 90, 2200, vector3(0.6, 0.7, 0.3), -2)
+
+// Sinker - fastball speed, heavy sink
+sinker = makePitch(releasePoint, 92, 2000, vector3(0.4, 0.3, 0.8), -1)
+
+// Knuckleball - very slow, almost no spin
+knuckleball = makePitch(releasePoint, 68, 50, vector3(0.3, 0.3, 0.3), 0)
+
+// Split-finger Fastball - moderate speed, tumbling action
+splitter = makePitch(releasePoint, 84, 1500, vector3(0.2, 0.4, 0.9), -3)
+
+// Sweeping Slider - modern slider with more horizontal break
+sweepSlider = makePitch(releasePoint, 83, 2600, vector3(0.9, 0.1, 0.4), -1)
+
+// Power Curveball - harder curve with more spin
+powerCurve = makePitch(releasePoint, 82, 3000, vector3(0.2, -0.8, 0.5), 1)
+
+// Screwball - rare pitch, reverse breaking
+screwball = makePitch(releasePoint, 79, 2100, vector3(-0.7, 0.5, 0.5), -1)

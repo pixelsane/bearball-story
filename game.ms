@@ -1,5 +1,6 @@
 import "player"
 import "bg"
+import "simulation"
 
 clear
 display(7).mode = displayMode.sprite
@@ -12,8 +13,8 @@ display(5).clear
 display(4).clear
 
 // Globals
-sim = simulationFP
 pr = new player.roster
+ball = new simulation.ball
 ballpark = new bg.ballpark
 spriteDisplay = display(4)
 batCursor = {"active": false, "batterID": null, "spr": new Sprite, "swinging": false, "minX": null, "minY": null, "maxX": null, "maxY": null}
@@ -143,16 +144,26 @@ batCursor.enable "righty", spriteDisplay
 
 displayStrikeZoneOf 2, spriteDisplay
 
-plateY = 18.44
-pitchTime = 0.0
-lastTime = time
+debug = {}
+debug.trackTL = function(str)
+	text.row = 25
+	text.clear
+	text.print str
+end function
 
-while not key.pressed("escape")
-	dt = time - lastTime
+loop = function(lastTime)
 	lastTime = time
-	batCursor.update dt
-	pr.getPlayerById(0).update dt
-	pr.getPlayerById(1).update dt
-	pr.getPlayerById(2).update dt
-	yield
-end while
+	while not key.pressed("escape")
+		dt = time - lastTime
+		lastTime = time
+		batCursor.update dt
+		ball.update dt
+		debug.trackTL ball.position
+		pr.getPlayerById(0).update dt
+		pr.getPlayerById(1).update dt
+		pr.getPlayerById(2).update dt
+		yield
+	end while
+end function
+
+loop
