@@ -1,6 +1,5 @@
 import "player"
 import "bg"
-import "simulationFP"
 
 clear
 display(7).mode = displayMode.sprite
@@ -13,6 +12,7 @@ display(5).clear
 display(4).clear
 
 // Globals
+sim = simulationFP
 pr = new player.roster
 ballpark = new bg.ballpark
 spriteDisplay = display(4)
@@ -143,9 +143,10 @@ batCursor.enable "righty", spriteDisplay
 
 displayStrikeZoneOf 2, spriteDisplay
 
-
-
+plateY = 18.44
+pitchTime = 0.0
 lastTime = time
+
 while not key.pressed("escape")
 	dt = time - lastTime
 	lastTime = time
@@ -153,6 +154,5 @@ while not key.pressed("escape")
 	pr.getPlayerById(0).update dt
 	pr.getPlayerById(1).update dt
 	pr.getPlayerById(2).update dt
-	tracker.track dt
 	yield
 end while
