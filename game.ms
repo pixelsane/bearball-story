@@ -1,6 +1,7 @@
 import "player"
 import "bg"
 import "simulation"
+import "pitchExamples"
 
 clear
 display(7).mode = displayMode.sprite
@@ -27,7 +28,7 @@ ballSprite.scale = 1
 
 strikeMarker.x = -800
 strikeMarker.y = -800
-strikeMarker.scale = 0.5
+strikeMarker.scale = 1
 
 catcherPOV = function(worldPos)
 	distance = worldPos.y + 1
@@ -44,18 +45,20 @@ end function
 pitchRecorded = false
 pitchRecord = {}
 
+// get from world not here coords
 showPitchLanding = function
 	pitch = pitchRecord
 	strikeMarker.x = pitchRecord.x
 	strikeMarker.y = pitchRecord.y
-	strikeMarker.scale = 0.8
-	strikeMarker.tint = color.rgba(255,255,255,150)
+	strikeMarker.scale = 1
+	strikeMarker.tint = color.rgba(255,255,255,255)
 end function
 
 moveBallSprite = function(movement)
-	if ballSprite.scale <= 0 then
-		ballSprite.x = -800
-		ballSprite.y = -800
+	if ballSprite.scale >= 1.9 or ballSprite.scale <= 0 then
+		ballSprite.x = -1000
+		ballSprite.y = -1000
+		ballSprite.scale = -1
 		showPitchLanding
 		return
 	end if
@@ -71,7 +74,7 @@ moveBallSprite = function(movement)
 	
 	ballSprite.x += cpov.x
 	ballSprite.y += cpov.y
-	ballSprite.scale = cpov.z / 2
+	ballSprite.scale = cpov.z
 end function
 
 ballSprite.image = file.loadImage("./assets/ball/baseball.png")
@@ -122,6 +125,7 @@ batCursor.update = function(dt)
 	self.swingEvent
 end function
 
+// get actual pos and w,h from worldCoord then translate px
 displayStrikeZone = function(w, h, disp, x = 480, y = 210)	
 	opacityValue = 190
 	originX = x - w / 2
@@ -214,10 +218,6 @@ end function
 
 loop = function(lastTime)
 	lastTime = time
-	releasePoint = vector3(-0.7, 1.5, -1)
-	lowTarget = vector3(-1.5, 0.4, -20.44)
-	fourSeamFB = makePitchToTarget(releasePoint, lowTarget, 95, 2300, vector3(0, 0.9, 0.1))
-	changeup = makePitchToTarget(releasePoint, lowTarget, 82, 1700, vector3(0.1, 0.6, 0.3))
 	pitcher = pr.getPlayerById(0)
 	
 	while not key.pressed("escape")	
@@ -227,7 +227,7 @@ loop = function(lastTime)
 		ball.update dt
 		moveBallSprite(ball.position)
 		
-		debug.trackTL ball.position
+		debug.trackTL ballSprite.scale
 		pr.getPlayerById(0).update dt
 		pr.getPlayerById(1).update dt
 		pr.getPlayerById(2).update dt
@@ -236,11 +236,11 @@ loop = function(lastTime)
 		pitchBeforeRelease = pitcher.curAnim.curFrame == 7
 		
 		if pitchBeforeRelease then
-			ballSprite.x = MOUND_X
-			ballSprite.y = MOUND_Y
+			ballSprite.x = pitcher.x
+			ballSprite.y = pitcher.y
 			ballSprite.scale = 0.0001
 		else if pitchReleased then
-			ball.setPitch(fourSeamFB)
+			ball.setPitch pitchExamples.fourSeamFastball
 		end if
 		
 		yield
