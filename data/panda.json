@@ -13,7 +13,12 @@
       "pitch1.png"
     ],
     "idlebat": [
-      "idlebat1.png"
+      "idlebat1.png",
+      "idlebat2.png",
+      "idlebat3.png",
+      "idlebat4.png",
+      "idlebat5.png",
+      "idlebat6.png"
     ],
     "swing": [
         "swing1.png",

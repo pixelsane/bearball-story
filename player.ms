@@ -66,23 +66,23 @@ end function
 
 roster.toMound = function(id)
   spr = self.players[id]
-	spr.x = bg.MOUND_X
-	spr.y = bg.MOUND_Y
-	spr.scale = bg.MOUND_SCALE
+	spr.x = MOUND_X
+	spr.y = MOUND_Y
+	spr.scale = MOUND_SCALE
 end function
 
 roster.toSecond = function(id)
   spr = self.players[id]
-	spr.x = bg.SECONDBASE_X
-	spr.y = bg.SECONDBASE_Y
-	spr.scale = bg.INFIELD_SCALE
+	spr.x = SECONDBASE_X
+	spr.y = SECONDBASE_Y
+	spr.scale = INFIELD_SCALE
 end function
 
 roster.toBat = function(id)
   spr = self.players[id]
-  spr.x = bg.PLATE_X
-  spr.y = bg.PLATE_Y
-  spr.scale = bg.BATTER_SCALE
+  spr.x = PLATE_X
+  spr.y = PLATE_Y
+  spr.scale = BATTER_SCALE
 end function
 
 roster.toDisp = function(id, disp)

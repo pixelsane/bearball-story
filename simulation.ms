@@ -20,7 +20,7 @@ phys = function
 end function
 
 newBall = function
-  return {"position": vector3, "velocity": vector3, "acceleration": vector3, "forces": vector3, "spin": vector3, "spinRate": 0, "trajectory": [], "phys": phys}
+  return {"releasePoint": vector3, "position": vector3, "velocity": vector3, "acceleration": vector3, "forces": vector3, "spin": vector3, "spinRate": 0, "trajectory": [], "phys": phys}
 end function
 
 ball = newBall
@@ -113,7 +113,29 @@ ball.update = function(dt)
   self.updatePos dt
 end function
 
-globals.makePitch = function(releasePoint, mph, rpm, spin, angle = -2)
+globals.makePitchToTarget = function(releasePoint, targetPos, mph, rpm, spin)
+  dx = targetPos.x - releasePoint.x
+  dy = targetPos.y - releasePoint.y  
+  dz = targetPos.z - releasePoint.z
+
+  distance = sqrt(dx^2 + dy^2 + dz^2)
+  horizontalDistance = sqrt(dx^2 + dz^2)
+  angle = atan(dy, horizontalDistance)
+
+  speedMS = MPHtoMS(mph)
+
+  velocity = vector3(
+    speedMS * (dx / distance),
+    speedMS * (dy / distance),
+    speedMS * (dz / distance))
+
+  spinRate = RPMtoRADS(rpm)
+
+  pitch = {"releasePoint": releasePoint, "position": releasePoint, "velocity": velocity, "spin": spin, "spinRate": spinRate}
+  return pitch
+end function
+
+globals.makePitch = function(releasePoint, targetPos, mph, rpm, spin, angle = -2)
   anyNull = releasePoint == null or mph == null or rpm == null or spin == null or angle == null
   if anyNull then
     pprint "WARNING: Pitch invalid, missing params"
@@ -134,7 +156,7 @@ globals.makePitch = function(releasePoint, mph, rpm, spin, angle = -2)
   spinRate = RPMtoRADS(rpm)
 
   // this returns a pitch config providing all necessary values to inject into the ball
-  pitch = {"position": position, "velocity": velocity, "spin": spin, "spinRate": spinRate}
+  pitch = {"releasePoint": releasePoint, "position": position, "velocity": velocity, "spin": spin, "spinRate": spinRate}
   return pitch
 end function
 

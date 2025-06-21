@@ -1,19 +1,19 @@
 // DO NOT MODIFY
 // Shove to its own json data
-SCREEN_W = 960
-SCREEN_H = 640
-MID_X = SCREEN_W / 2
-MID_Y = SCREEN_H / 2
-PLATE_X = MID_X / 1.5
-PLATE_Y = MID_Y / 1.3
-MOUND_X = MID_X
-MOUND_Y = MID_Y + 70
-SECONDBASE_X = MOUND_X
-SECONDBASE_Y = MOUND_Y + 110 
-INFIELD_SCALE = 1
-MOUND_SCALE = 2
-BATTER_SCALE = 5
-BP_DIR = "./assets/ballparks/"
+globals.SCREEN_W = 960
+globals.SCREEN_H = 640
+globals.MID_X = SCREEN_W / 2
+globals.MID_Y = SCREEN_H / 2
+globals.PLATE_X = MID_X / 1.5
+globals.PLATE_Y = MID_Y / 1.3
+globals.MOUND_X = MID_X
+globals.MOUND_Y = MID_Y + 70
+globals.SECONDBASE_X = MOUND_X
+globals.SECONDBASE_Y = MOUND_Y + 110 
+globals.INFIELD_SCALE = 1
+globals.MOUND_SCALE = 2
+globals.BATTER_SCALE = 5
+globals.BP_DIR = "./assets/ballparks/"
 
 
 // Globals
