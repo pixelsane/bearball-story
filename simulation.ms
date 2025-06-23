@@ -15,12 +15,15 @@ globals.RPMtoRADS = function(rpm)
 end function
 
 phys = function
-  // maybe return conversion methods from here later or another func
-  return {"mass": 0.145, "airDensity": 1.225, "gravity": 9.81, "radius": 0.037, "dragCoeff": 0.3, "magCoeff": 0.0008, "circumference": 0.229}
+  // magCoeff, it is hard to decide what best fits the game
+  // but going for way too high of realism doesn't make it better since most pitches look the same
+  // obviously player will have the choice but here's a guidline
+  // 0.0001 = Realism, 0.0005 = MLB, 0.0008 = Visible breaking balls, 0.001 = Barely visible fastball variants, 0.008 = Anime, and higher is arcade
+  return {"mass": 0.145, "airDensity": 1.225, "gravity": 9.81, "radius": 0.037, "dragCoeff": 0.3, "magCoeff": 0.0005, "circumference": 0.229}
 end function
 
 newBall = function
-  return {"releasePoint": vector3, "position": vector3, "velocity": vector3, "acceleration": vector3, "forces": vector3, "spin": vector3, "spinRate": 0, "trajectory": [], "phys": phys, "time": 0}
+  return {"releasePoint": vector3, "position": vector3, "velocity": vector3, "acceleration": vector3, "forces": vector3, "spin": vector3, "spinRate": 0, "trajectory": [], "phys": phys, "time": 0, "updateCount": 0}
 end function
 
 ball = newBall
@@ -32,6 +35,8 @@ ball.reset = function
   self.acceleration = blank.acceleration
   self.trajectory = blank.trajectory
   self.phys = blank.phys
+  self.time = 0
+  self.updateCount = 0
 end function
 
 ball.initAccel = function
@@ -81,11 +86,10 @@ ball.calculateForces = function
 end function
 
 ball.applySpinDecay = function(dt)
-  decayRate = 0.95  // Retains 95% of spin per second (adjust as needed)
+  decayRate = 0.99
   decayFactor = decayRate ^ dt
 
   self.spinRate *= decayFactor
-
   self.spin.x *= decayFactor
   self.spin.y *= decayFactor  
   self.spin.z *= decayFactor
@@ -105,6 +109,7 @@ ball.updatePos = function(dt)
   self.position.x += self.velocity.x * dt
   self.position.y += self.velocity.y * dt
   self.position.z += self.velocity.z * dt
+
 end function
 
 ball.setPitch = function(pitch)
@@ -125,15 +130,18 @@ end function
 
 ball.update = function(dt)
   self.time += dt
-  if self.trajectory.len == 0 or self.time % (1/60) < dt then
-    self.trajectory.push self.position
-  end if
 
   self.initForces
   self.initAccel
   self.updateVel dt
   self.updatePos dt
   self.applySpinDecay dt
+
+  updateCount = self.updateCount
+  if updateCount % 4 == 0 then  // Every 4th update at 60fps = 15fps trajectory
+    self.trajectory.push self.position
+  end if
+  self.updateCount += 1
 end function
 
 globals.makePitchToTarget = function(releasePoint, targetPos, mph, rpm, spin)

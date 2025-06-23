@@ -1,12 +1,12 @@
 // MLB PITCH ARSENAL - Complete Library
 // Based on actual big league pitch data and characteristics
 
-releasePoint = vector3(-0.3, 2, 1.8)
-strikeZoneCenter = vector3(-0.3, 0, -12)
-strikeZoneHigh = vector3(-0.3, 0, -9.5)
-strikeZoneLow = vector3(-0.3, -0.5, -16)
-strikeZoneInside = vector3(2.8, 0, -12)
-strikeZoneOutside = vector3(-2.8, 0, -12)
+releasePoint = vector3(475, 140, 500)
+strikeZoneCenter = vector3(480, 56, 496)
+strikeZoneHigh = vector3(480, 56, 493)
+strikeZoneLow = vector3(480, 56, 485)
+strikeZoneInside = vector3(477.3, 56, 493)
+strikeZoneOutside = vector3(488, 56, 493)
 
 // Four-Seam Fastball (Rising Fastball)
 fourSeamFastball = makePitchToTarget(
@@ -65,7 +65,7 @@ sweeper = makePitchToTarget(
 
 // Slurve (Slider-Curve Hybrid)
 slurve = makePitchToTarget(
-  releasePoint, strikeZoneLow,
+  releasePoint, strikeZoneOutside,
   81, 2300, vector3(0.5, 0, -0.87))  // Between slider and curve
 
 // Circle Changeup
@@ -262,6 +262,10 @@ submarineFastball = makePitchToTarget(
 emeball = makePitchToTarget(
   releasePoint, strikeZoneOutside,
   81, 1100, vector3(0.4, 0.2, -0.3))  // Unpredictable break
+
+cyclone = makePitchToTarget(
+  releasePoint, strikeZoneLow,
+  80, 20000, vector3(0, 0, 0.0))  // Extreme rotation
 
 // Power Pitcher Arsenal
 powerArsenal = [chapmanFastball, subwaySlider, powerChangeup]

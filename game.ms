@@ -1,250 +1,112 @@
+// MAIN PRIORITY!!!! COMPLETE WORLD COORDS AND DISPLAY MUST TRANSLATE FROM IT! NO MORE PIXEL MEASUREMENT
+
 import "player"
 import "bg"
 import "simulation"
 import "pitchExamples"
 
+TOP = "top"
+CATCHER = "catcher"
+
 clear
-display(7).mode = displayMode.sprite
+display(7).mode = displayMode.pixel
 display(6).mode = displayMode.pixel
 display(4).mode = displayMode.sprite
-
 display(7).clear
 display(6).clear
 display(5).clear
 display(4).clear
+bgDisplay = display(7)
 spriteDisplay = display(4)
 
-
-// Globals -- this entire thing might go into catcher.ms
-pr = new player.roster
-ball = new simulation.ball
 ballSprite = new Sprite
-strikeMarker = new Sprite
-ballpark = new bg.ballpark
-
-ballSprite.x = -800
-ballSprite.y = -800
-ballSprite.scale = 1
-
-strikeMarker.x = -800
-strikeMarker.y = -800
-strikeMarker.scale = 1
-
-catcherPOV = function(worldPos)
-	distance = worldPos.y + 1
-	perspective = 1.0 / distance
-	
-	catcherX = worldPos.x
-	catcherY = worldPos.z
-	catcherZ = perspective
-	
-	return {"x": catcherX, "y": catcherY, "z": catcherZ}
-end function
-
-// refactor to its own class later -- just a proof of concept
-pitchRecorded = false
-pitchRecord = {}
-
-// get from world not here coords
-showPitchLanding = function
-	pitch = pitchRecord
-	strikeMarker.x = pitchRecord.x
-	strikeMarker.y = pitchRecord.y
-	strikeMarker.scale = 1
-	strikeMarker.tint = color.rgba(255,255,255,255)
-end function
-
-moveBallSprite = function(movement)
-	if ballSprite.scale >= 1.9 or ballSprite.scale <= 0 then
-		ballSprite.x = -1000
-		ballSprite.y = -1000
-		ballSprite.scale = -1
-		showPitchLanding
-		return
-	end if
-	
-	if ballSprite.scale >= 1 and not(pitchRecorded) then
-		pitchRecord.x = ballSprite.x
-		pitchRecord.y = ballSprite.y
-		pitchRecord.scale = ballSprite.scale
-		pitchRecorded = true
-	end if
-	
-	cpov = catcherPOV(movement)
-	
-	ballSprite.x += cpov.x
-	ballSprite.y += cpov.y
-	ballSprite.scale = cpov.z
-end function
-
 ballSprite.image = file.loadImage("./assets/ball/baseball.png")
-strikeMarker.image = file.loadImage("./assets/ball/strikeMarker.png")
+ball = new simulation.ball
+ballpark = new bg.ballpark
+pr = new player.roster
 
-batCursor = {"active": false, "batterID": null, "spr": new Sprite, "swinging": false, "minX": null, "minY": null, "maxX": null, "maxY": null}
-batCursor.enable = function(side, disp)
-	self.spr.image = file.loadImage("./assets/batCursor/" + side + ".png")
-	self.spr.scale = 2
-	disp.sprites.push self.spr
+// top view use world coords
+setBallPosition = function(worldBall, newPos, offsetX = 0, offsetY = 0, offsetZ = 0) 
+	worldBall.position.x = newPos.x + offsetX
+	worldBall.position.y = newPos.y + offsetY
+	worldBall.position.z = newPos.z + offsetZ
 end function
 
-batCursor.checkBounds = function
-	insideX = mouse.x >= self.minX and mouse.x <= self.maxX
-	insideY = mouse.y >= self.minY and mouse.y <= self.maxY
-	inside = insideX and insideY
-	
-	if inside then
-		self.active = true
-	else
-		self.active = false	
+placeBall = function(view, worldBall, ballSpr, zScale = 0.4)
+	// use pattern matching later, if they exist, internet is so ass
+	if view == TOP then
+		ballSpr.x = worldBall.position.x
+		ballSpr.y = worldBall.position.y
+		ballSpr.rotation += worldBall.spin.z * worldBall.spinRate
+		ballSpr.scale = zScale * (worldBall.position.z / 500)
 	end if
-end function
-
-batCursor.mouseToBatCursor = function
-	self.spr.x = mouse.x
-	self.spr.y = mouse.y
-end function
-
-batCursor.swingEvent = function
-	if mouse.button(0) and not(self.swinging) then
-		self.swinging = true
-		pr.animate self.batterID, "swing"
-	end if
-end function
-
-batCursor.update = function(dt)
-	self.checkBounds
-	if not self.active then
-		self.spr.x = -200
-		self.spr.y = -200
-		mouse.visible = true
-		return
-	end if
-	
-	mouse.visible = false
-	self.mouseToBatCursor
-	self.swingEvent
-end function
-
-// get actual pos and w,h from worldCoord then translate px
-displayStrikeZone = function(w, h, disp, x = 480, y = 210)	
-	opacityValue = 190
-	originX = x - w / 2
-	originY = y - h / 2
-	fullWidth = originX + w
-	fullHeight = originY + h
-	
-	horizontalImg = file.loadImage("./assets/strikezone/bottomCorner.png")
-	
-	batCursor.minX = originX
-	batCursor.maxX = fullWidth
-	
-	batCursor.minY = originY
-	batCursor.maxY = fullHeight
-	
-	topCornerLeft = new Sprite
-	topCornerLeft.image = file.loadImage("./assets/strikezone/topCorner.png")
-	topCornerLeft.x = originX
-	topCornerLeft.y = fullHeight
-	topCornerLeft.tint = color.rgba(255,255, 255, opacityValue)
-	topCornerLeft.scale = 2
-	
-	topCornerRight = new Sprite
-	topCornerRight.image = file.loadImage("./assets/strikezone/topCorner.png")
-	topCornerRight.x = fullWidth
-	topCornerRight.y = fullHeight
-	topCornerRight.tint = color.rgba(255,255, 255, opacityValue)
-	topCornerRight.scale = [-2, 2]
-	
-	bottomCornerLeft = new Sprite
-	bottomCornerLeft.image = file.loadImage("./assets/strikezone/bottomCorner.png")
-	bottomCornerLeft.x = originX
-	bottomCornerLeft.y = originY
-	bottomCornerLeft.tint = color.rgba(255,255, 255, opacityValue)
-	bottomCornerLeft.scale = 2
-	
-	bottomCornerRight = new Sprite
-	bottomCornerRight.image = file.loadImage("./assets/strikezone/bottomCorner.png")
-	bottomCornerRight.x = fullWidth
-	bottomCornerRight.y = originY
-	bottomCornerRight.tint = color.rgba(255,255, 255, opacityValue)
-	bottomCornerRight.scale = [-2, 2]
-	
-	display(6).fillRect(originX, originY, w, h, color.rgba(255,255,255, 75))	
-	
-	disp.sprites.push topCornerLeft
-	disp.sprites.push topCornerRight
-	disp.sprites.push bottomCornerLeft
-	disp.sprites.push bottomCornerRight
-end function
-
-displayStrikeZoneOf = function(id, disp)
-	targetPlayer = pr.getPlayerById(id)
-	displayStrikeZone(targetPlayer.strikezoneWidth, targetPlayer.strikezoneHeight, disp)
 end function
 
 // preload
-ballpark.load(0, "bearstadium")
-pr.loadPlayerData(0, "bear")
-pr.loadPlayerData(1, "bear")
-pr.loadPlayerData(2, "panda")
+ballpark.load 0, "bearstadium"
+pr.loadPlayerData 0, "bear"
+pr.loadPlayerData 1, "bear"
+pr.loadPlayerData 2, "bear"
+pr.loadPlayerData 3, "bear"
+pr.loadPlayerData 4, "bear"
+pr.loadPlayerData 5, "bear"
+pr.loadPlayerData 6, "bear"
+pr.loadPlayerData 7, "bear"
+pr.loadPlayerData 8, "panda"
 
-// init
-ballpark.display 0, display(7)
-pr.animate 0, "pitch"
-pr.animate 1, "idle", true
-pr.animate 2, "idlebat", true
-
-pr.toMound 0
-pr.toSecond 1
-pr.toBat 2
-
-pr.toDisp 0, spriteDisplay
-pr.toDisp 1, spriteDisplay
-pr.toDisp 2, spriteDisplay
-spriteDisplay.sprites.push strikeMarker
+// display stuff
+ballpark.display 0, "top", bgDisplay
 spriteDisplay.sprites.push ballSprite
+defaultMound = ballpark.getPosition(0, "mound")
+defaultFB = ballpark.getPosition(0, "firstBase")
+defaultSB = ballpark.getPosition(0, "secondBase")
+defaultTB = ballpark.getPosition(0, "thirdBase")
+defaultLF = ballpark.getPosition(0, "leftField")
+defaultCF = ballpark.getPosition(0, "centerField")
+defaultRF = ballpark.getPosition(0, "rightField")
+defaultHome = ballpark.getPosition(0, "home")
+defaultBL = ballpark.getPosition(0, "batterLeft")
+defaultBR = ballpark.getPosition(0, "batterRight")
 
-batCursor.batterID = 2
-batCursor.enable "righty", spriteDisplay
-
-displayStrikeZoneOf 2, spriteDisplay
-
-debug = {}
-debug.trackTL = function(str)
-	text.row = 25
-	text.clear
-	text.print str
+defaultInit = function(id, view, pos, anim = "idleAnim", offsetX = 0, offsetY = 0)
+	pr.display id, view, spriteDisplay
+	pr.setPosition id, pos, offsetX, offsetY
+	pr.animate id, view, anim
 end function
 
-loop = function(lastTime)
+defaultUpdate = function(id, view, dt = 0.1)
+	pr.place id, view
+	pr.update id, dt
+end function
+
+initAndLoop = function
 	lastTime = time
-	pitcher = pr.getPlayerById(0)
+	view = TOP
+	setBallPosition ball, pr.getWorldPos(0)
+	defaultInit 0, view, defaultMound
+	defaultInit 1, view, defaultFB
+	defaultInit 2, view, defaultSB, "idleAnim", 80
+	defaultInit 3, view, defaultTB
+	defaultInit 4, view, defaultLF
+	defaultInit 5, view, defaultCF
+	defaultInit 6, view, defaultRF
+	defaultInit 7, view, defaultSB, "idleAnim", -80
+	defaultInit 8, view, defaultBL
 	
-	while not key.pressed("escape")	
+	ball.setPitch pitchExamples.curveball12to6
+	
+	while not key.pressed("escape")
 		dt = time - lastTime
 		lastTime = time
-		batCursor.update dt
+		playerCount = 9
+		
+		placeBall view, ball, ballSprite
 		ball.update dt
-		moveBallSprite(ball.position)
 		
-		debug.trackTL ballSprite.scale
-		pr.getPlayerById(0).update dt
-		pr.getPlayerById(1).update dt
-		pr.getPlayerById(2).update dt
-		
-		pitchReleased = pitcher.curAnim.curFrame >= 8
-		pitchBeforeRelease = pitcher.curAnim.curFrame == 7
-		
-		if pitchBeforeRelease then
-			ballSprite.x = pitcher.x
-			ballSprite.y = pitcher.y
-			ballSprite.scale = 0.0001
-		else if pitchReleased then
-			ball.setPitch pitchExamples.fourSeamFastball
-		end if
-		
-		yield
+		for activePlayerID in range(0, playerCount - 1)
+			defaultUpdate activePlayerID, view, dt	
+		end for
 	end while
 end function
 
-loop
+initAndLoop

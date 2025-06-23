@@ -1,39 +1,54 @@
+import "json"
 // DO NOT MODIFY
 // Shove to its own json data
 globals.SCREEN_W = 960
 globals.SCREEN_H = 640
 globals.MID_X = SCREEN_W / 2
 globals.MID_Y = SCREEN_H / 2
-globals.PLATE_X = MID_X / 1.5
-globals.PLATE_Y = MID_Y / 1.3
-globals.MOUND_X = MID_X
-globals.MOUND_Y = MID_Y + 70
-globals.SECONDBASE_X = MOUND_X
-globals.SECONDBASE_Y = MOUND_Y + 110 
-globals.INFIELD_SCALE = 1
-globals.MOUND_SCALE = 2
-globals.BATTER_SCALE = 5
 globals.BP_DIR = "./assets/ballparks/"
 
 
 // Globals
-ballparkProps = { "id": null, "sprite": null }
 ballpark = {"pool": {}}
 
-ballpark.load = function(id = 0, name, ext = ".png")
-	image = file.loadImage(BP_DIR + name + ext)
-	newBallpark = new ballparkProps
+ballpark.load = function(id = 0, name)
+  dataFile = file.open("./data/"+name+".json")
+  ballparkData = json.parse(dataFile.read)
+  dataFile.close
+
+	newBallpark = {}
+  topImage = file.loadImage(ballparkData.top.imageFile)
+  catcherImage = file.loadImage(ballparkData.catcher.imageFile)
+  positions = {
+    "mound": ballparkData.mound,
+    "home": ballparkData.home,
+    "batterLeft": ballparkData.batterLeft,
+    "batterRight": ballparkData.batterRight,
+    "firstBase": ballparkData.firstBase,
+    "secondBase": ballparkData.secondBase,
+    "thirdBase": ballparkData.thirdBase,
+    "leftField": ballparkData.leftField,
+    "centerField": ballparkData.centerField,
+    "rightField": ballparkData.rightField}
+  backgrounds = {"top": topImage, "catcher": catcherImage}
 	newBallpark.name = name
 	newBallpark.id = self.pool.len
-	newBallpark.sprite = new Sprite
-	newBallpark.sprite.image = image
+  newBallpark.backgrounds = backgrounds
+  newBallpark.positions = positions
 	self.pool[id] = newBallpark
 end function
 
-ballpark.display = function(id, disp)
+// Position Methods -- All methods return worldPos
+ballpark.getPositions = function(id)
+	return self.pool[id].positions
+end function
+
+ballpark.getPosition = function(id, posName)
+  allPositions = self.getPositions(id)
+  return allPositions[posName]
+end function
+
+ballpark.display = function(id, bgName, disp)
 	selected = self.pool[id]
-	selected.sprite.scale = 2
-	selected.sprite.x = MID_X
-	selected.sprite.y = MID_Y
-	disp.sprites.push selected.sprite
+	disp.drawImage  selected.backgrounds[bgName]
 end function

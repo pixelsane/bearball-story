@@ -1,4 +1,5 @@
 {
+  "icon": "./assets/panda/pandaIcon.png",
   "spriteDirectory": "./assets/panda/",
   "pitchRelease": {"x": 32, "y": 40},
   "battingStance": "righty"

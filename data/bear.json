@@ -1,4 +1,5 @@
 {
+  "icon": "./assets/bear/bearIcon.png",
   "spriteDirectory": "./assets/bear/",
   "pitchRelease": {"x": 32, "y": 40},
   "battingStance": "righty",

@@ -1,0 +1,59 @@
+{
+  "name": "Bear Ball",
+  "batterLeft": {
+    "x": 460,
+    "y": 57,
+    "z": 1
+  },
+  "batterRight": {
+    "x": 460,
+    "y": 57,
+    "z": 1
+  },
+  "mound": {
+    "x": 480,
+    "y": 140,
+    "z": 1.25
+  },
+  "home": {
+    "x": 480,
+    "y": 57,
+    "z": 1
+  },
+  "firstBase": {
+    "x": 575,
+    "y": 154,
+    "z": 1
+  },
+  "secondBase": {
+    "x": 480,
+    "y": 245,
+    "z": 1
+  },
+  "thirdBase": {
+    "x": 385,
+    "y": 154,
+    "z": 1
+  },
+  "leftField": {
+    "x": 260,
+    "y": 405,
+    "z": 1
+  },
+  "centerField": {
+    "x": 480,
+    "y": 555,
+    "z": 1
+  },
+  "rightField": {
+    "x": 700,
+    "y": 405,
+    "z": 1
+  },
+  "top" : {
+    "imageFile": "./assets/ballparks/bearstadium-top.png"
+  },
+  "catcher": {
+    "imageFile": "./assets/ballparks/bearstadium.png"
+  }
+}
