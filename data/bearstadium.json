@@ -13,7 +13,7 @@
   "mound": {
     "x": 480,
     "y": 140,
-    "z": 1.25
+    "z": 1
   },
   "home": {
     "x": 480,
@@ -51,9 +51,11 @@
     "z": 1
   },
   "top" : {
-    "imageFile": "./assets/ballparks/bearstadium-top.png"
+    "imageFile": "./assets/ballparks/bearstadium-top.png",
+    "scale": 1
   },
   "catcher": {
-    "imageFile": "./assets/ballparks/bearstadium.png"
+    "imageFile": "./assets/ballparks/bearstadium.png",
+    "scale": 2
   }
 }

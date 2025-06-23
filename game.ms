@@ -39,6 +39,17 @@ placeBall = function(view, worldBall, ballSpr, zScale = 0.4)
 		ballSpr.y = worldBall.position.y
 		ballSpr.rotation += worldBall.spin.z * worldBall.spinRate
 		ballSpr.scale = zScale * (worldBall.position.z / 500)
+		if ballSpr.scale <= 0 then
+			ballSpr.scale = 0
+		end if
+	else if view == CATCHER then
+		ballSpr.x = (worldBall.position.x * 4) - 1430
+		ballSpr.y = (worldBall.position.z * 4) - 1580
+		ballSpr.rotation += worldBall.spin.z * worldBall.spinRate
+		ballSpr.scale = 100 / worldBall.position.y
+		if ballSpr.scale <= 0 then
+			ballSpr.scale = 0
+		end if
 	end if
 end function
 
@@ -54,9 +65,6 @@ pr.loadPlayerData 6, "bear"
 pr.loadPlayerData 7, "bear"
 pr.loadPlayerData 8, "panda"
 
-// display stuff
-ballpark.display 0, "top", bgDisplay
-spriteDisplay.sprites.push ballSprite
 defaultMound = ballpark.getPosition(0, "mound")
 defaultFB = ballpark.getPosition(0, "firstBase")
 defaultSB = ballpark.getPosition(0, "secondBase")
@@ -68,10 +76,10 @@ defaultHome = ballpark.getPosition(0, "home")
 defaultBL = ballpark.getPosition(0, "batterLeft")
 defaultBR = ballpark.getPosition(0, "batterRight")
 
-defaultInit = function(id, view, pos, anim = "idleAnim", offsetX = 0, offsetY = 0)
+defaultInit = function(id, view, pos, anim = "idle", loop = true, offsetX = 0, offsetY = 0)
 	pr.display id, view, spriteDisplay
 	pr.setPosition id, pos, offsetX, offsetY
-	pr.animate id, view, anim
+	pr.animate id, view, anim, loop
 end function
 
 defaultUpdate = function(id, view, dt = 0.1)
@@ -81,31 +89,38 @@ end function
 
 initAndLoop = function
 	lastTime = time
-	view = TOP
+	view = CATCHER
+	pitcher = pr.getPlayerById(0)
 	setBallPosition ball, pr.getWorldPos(0)
-	defaultInit 0, view, defaultMound
+	
+	defaultInit 0, view, defaultMound, "pitch", false
 	defaultInit 1, view, defaultFB
-	defaultInit 2, view, defaultSB, "idleAnim", 80
+	defaultInit 2, view, defaultSB, "idle", true, 20
 	defaultInit 3, view, defaultTB
 	defaultInit 4, view, defaultLF
 	defaultInit 5, view, defaultCF
 	defaultInit 6, view, defaultRF
-	defaultInit 7, view, defaultSB, "idleAnim", -80
-	defaultInit 8, view, defaultBL
+	defaultInit 7, view, defaultSB, "idle", true, -80
+	defaultInit 8, view, defaultBL, "idlebat"
 	
-	ball.setPitch pitchExamples.curveball12to6
-	
+	ballpark.display 0, view, bgDisplay
+	spriteDisplay.sprites.push ballSprite
 	while not key.pressed("escape")
 		dt = time - lastTime
 		lastTime = time
 		playerCount = 9
 		
 		placeBall view, ball, ballSprite
-		ball.update dt
+		ball.update dt * 3
 		
 		for activePlayerID in range(0, playerCount - 1)
 			defaultUpdate activePlayerID, view, dt	
 		end for
+		
+		pitchReleased = pitcher[view].curAnim.curFrame >= 8 or view == TOP
+		if pitchReleased then
+			ball.setPitch pitchExamples.knuckleball
+		end if	
 	end while
 end function
 

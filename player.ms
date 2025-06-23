@@ -34,7 +34,7 @@ roster.loadPlayerData = function(id, name)
 	
   playerData = parsePlayerData(name)
   sprDir = playerData.spriteDirectory
-  
+ 
 	newPlayer = {}
   newPlayer.top = new Animated
   newPlayer.catcher = new Animated
@@ -46,7 +46,6 @@ roster.loadPlayerData = function(id, name)
 
   // add top animations
   icon = file.loadImage(playerData.icon)
-  newPlayer.top.idleAnim = newAnimation([icon])
 
   // add catcher POV animation
   // expand this to a general func later then imperatively call
@@ -59,6 +58,7 @@ roster.loadPlayerData = function(id, name)
       animStack.push(file.loadImage(filePath))
     end for
 
+    newPlayer.top[animKey] = newAnimation([icon])
     newPlayer.catcher[animKey] = newAnimation(animStack)
   end for
 
@@ -102,9 +102,16 @@ end function
 roster.place = function(id, pov)
   worldPos = self.players[id].worldPos
   spr = self.players[id][pov]
-  spr.x = worldPos.x
-  spr.y = worldPos.y
-  spr.scale = worldPos.z
+  if pov == "top" then
+    spr.x = worldPos.x
+    spr.y = worldPos.y
+    spr.scale = worldPos.z
+  else if pov == "catcher" then
+    spr.x = (worldPos.x * 8) - 3360
+    spr.y =  ((worldPos.y - worldPos.z) * 1.8) + 175
+    spr.scale = (1 / worldPos.y) * 300
+    
+  end if
 end function
 
 roster.display = function(id, pov, disp)

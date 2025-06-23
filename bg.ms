@@ -50,5 +50,5 @@ end function
 
 ballpark.display = function(id, bgName, disp)
 	selected = self.pool[id]
-	disp.drawImage  selected.backgrounds[bgName]
+	disp.drawImage selected.backgrounds[bgName], 0, 0, 960, 640
 end function

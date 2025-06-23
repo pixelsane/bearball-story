@@ -5,8 +5,8 @@ releasePoint = vector3(475, 140, 500)
 strikeZoneCenter = vector3(480, 56, 496)
 strikeZoneHigh = vector3(480, 56, 493)
 strikeZoneLow = vector3(480, 56, 485)
-strikeZoneInside = vector3(477.3, 56, 493)
-strikeZoneOutside = vector3(488, 56, 493)
+strikeZoneOutside = vector3(467.3, 56, 493)
+strikeZoneInside = vector3(478, 56, 493)
 
 // Four-Seam Fastball (Rising Fastball)
 fourSeamFastball = makePitchToTarget(
