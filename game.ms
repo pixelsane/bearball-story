@@ -34,22 +34,20 @@ end function
 
 placeBall = function(view, worldBall, ballSpr, zScale = 0.4)
 	// use pattern matching later, if they exist, internet is so ass
+	if worldBall.position.y <= 34 then
+		ballSpr.scale = 0
+		return
+	end if
 	if view == TOP then
 		ballSpr.x = worldBall.position.x
 		ballSpr.y = worldBall.position.y
 		ballSpr.rotation += worldBall.spin.z * worldBall.spinRate
 		ballSpr.scale = zScale * (worldBall.position.z / 500)
-		if ballSpr.scale <= 0 then
-			ballSpr.scale = 0
-		end if
 	else if view == CATCHER then
 		ballSpr.x = (worldBall.position.x * 4) - 1430
 		ballSpr.y = (worldBall.position.z * 4) - 1580
 		ballSpr.rotation += worldBall.spin.z * worldBall.spinRate
-		ballSpr.scale = 100 / worldBall.position.y
-		if ballSpr.scale <= 0 then
-			ballSpr.scale = 0
-		end if
+		ballSpr.scale = 50 / worldBall.position.y
 	end if
 end function
 
@@ -111,7 +109,7 @@ initAndLoop = function
 		playerCount = 9
 		
 		placeBall view, ball, ballSprite
-		ball.update dt * 3
+		ball.update dt * 4
 		
 		for activePlayerID in range(0, playerCount - 1)
 			defaultUpdate activePlayerID, view, dt	
@@ -119,8 +117,8 @@ initAndLoop = function
 		
 		pitchReleased = pitcher[view].curAnim.curFrame >= 8 or view == TOP
 		if pitchReleased then
-			ball.setPitch pitchExamples.knuckleball
-		end if	
+			ball.setPitch pitchExamples.slider
+		end if
 	end while
 end function
 

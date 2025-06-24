@@ -1,12 +1,12 @@
 // MLB PITCH ARSENAL - Complete Library
 // Based on actual big league pitch data and characteristics
 
-releasePoint = vector3(475, 140, 500)
-strikeZoneCenter = vector3(480, 56, 496)
-strikeZoneHigh = vector3(480, 56, 493)
-strikeZoneLow = vector3(480, 56, 485)
-strikeZoneOutside = vector3(467.3, 56, 493)
-strikeZoneInside = vector3(478, 56, 493)
+releasePoint = vector3(478, 140, 500)
+strikeZoneCenter = vector3(480, 34, 496)
+strikeZoneHigh = vector3(480, 34, 493)
+strikeZoneLow = vector3(480, 34, 485)
+strikeZoneOutside = vector3(467.3, 34, 493)
+strikeZoneInside = vector3(478, 34, 493)
 
 // Four-Seam Fastball (Rising Fastball)
 fourSeamFastball = makePitchToTarget(

@@ -39,6 +39,22 @@ ball.reset = function
   self.updateCount = 0
 end function
 
+ball.rotateSpinAxis = function(dt, pr)
+  // Only enable this for heavier style motions
+  // precessionRate: Realistic would be ~0.1, anime is ~2.0
+  precessionRate = pr
+  angle = self.time * precessionRate
+
+  cos_a = cos(angle)
+  sin_a = sin(angle)
+
+  newSpinX = self.spin.x * cos_a - self.spin.z * sin_a
+  newSpinZ = self.spin.x * sin_a + self.spin.z * cos_a
+
+  self.spin.x = newSpinX
+  self.spin.z = newSpinZ
+end function
+
 ball.initAccel = function
   self.acceleration.x = self.forces.x / self.phys.mass
   self.acceleration.y = self.forces.y / self.phys.mass
@@ -77,7 +93,6 @@ ball.calculateForces = function
     magCoeff * (self.spin.y * velDir.z - self.spin.z * velDir.y),
     magCoeff * (self.spin.y * velDir.x - self.spin.x * velDir.z),
     magCoeff * (self.spin.x * velDir.y - self.spin.y * velDir.x))
-  // add spin decay after this
 
   return vector3(
     gravity.x + drag.x + magnus.x,
@@ -128,9 +143,10 @@ ball.setThrow = function
 
 end function
 
-ball.update = function(dt)
+ball.update = function(dt, pr = 2.0)
   self.time += dt
 
+  self.rotateSpinAxis dt, pr
   self.initForces
   self.initAccel
   self.updateVel dt
